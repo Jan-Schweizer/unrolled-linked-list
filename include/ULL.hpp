@@ -9,12 +9,9 @@
 #include <cassert>
 #include <cstdint>
 // ------------------------------------------------------------------------
-// TODO: make BLOCK_SIZE as template parameter
-#define BLOCK_SIZE 15
-// ------------------------------------------------------------------------
 // TODO: Replace data[i] = data[i + 1] with std::copy
 // ------------------------------------------------------------------------
-template <class V>
+template <class V, size_t BLOCK_SIZE = 3>
 class ULL {
    class Node {
       friend class ULL;
@@ -38,7 +35,6 @@ class ULL {
       }
 
       void shift_r();
-
       V remove_at(size_t i);
    };
 
@@ -49,9 +45,7 @@ class ULL {
    };
 
    public:
-   /// Store the end of the list in head
-   ///
-   /// ->prev.
+   /// Store the end of the list in head->prev.
    Node* head = nullptr; // TODO: Think about using a unique_ptr
    size_t length = 0;
    size_t node_count = 0;
@@ -87,6 +81,9 @@ class ULL {
       return insert_at(0, std::forward<Args>(args)...);
    }
 
+   /// Prints the list to cout
+   void print_list();
+
    private:
    /// Spreads the elements of the sequence u.next to v onto the sequence u.next to v.next,
    /// such that each node in the sequence u.next to v contains BLOCK_SIZE elements and
@@ -95,9 +92,9 @@ class ULL {
 };
 // Node - Begin
 // ------------------------------------------------------------------------
-template <class V>
+template <class V, size_t BLOCK_SIZE>
 template <class... Args>
-void ULL<V>::Node::insert_at(size_t i, Args&&... args) {
+void ULL<V, BLOCK_SIZE>::Node::insert_at(size_t i, Args&&... args) {
    assert(length < BLOCK_SIZE + 1);
 
    for (size_t idx = length; idx > i; --idx) {
@@ -107,8 +104,8 @@ void ULL<V>::Node::insert_at(size_t i, Args&&... args) {
    ++length;
 }
 // ------------------------------------------------------------------------
-template <class V>
-void ULL<V>::Node::shift_r() {
+template <class V, size_t BLOCK_SIZE>
+void ULL<V, BLOCK_SIZE>::Node::shift_r() {
    Node* u = this->next;
    for (size_t idx = u->length; idx > 0; --idx) {
       u->data[idx] = u->data[idx - 1];
@@ -118,8 +115,8 @@ void ULL<V>::Node::shift_r() {
    --length;
 }
 // ------------------------------------------------------------------------
-template <class V>
-V ULL<V>::Node::remove_at(size_t i) {
+template <class V, size_t BLOCK_SIZE>
+V ULL<V, BLOCK_SIZE>::Node::remove_at(size_t i) {
    assert(i >= 0 && i < length);
 
    V ret = data[i];
@@ -133,11 +130,11 @@ V ULL<V>::Node::remove_at(size_t i) {
 // Node - End
 // ------------------------------------------------------------------------
 // ULL - Begin
-template <class V>
-ULL<V>::ULL() = default;
+template <class V, size_t BLOCK_SIZE>
+ULL<V, BLOCK_SIZE>::ULL() = default;
 // ------------------------------------------------------------------------
-template <class V>
-class ULL<V>::Location ULL<V>::find_at(int i) {
+template <class V, size_t BLOCK_SIZE>
+class ULL<V, BLOCK_SIZE>::Location ULL<V, BLOCK_SIZE>::find_at(int i) {
    Node* u = head;
    if (i < length / 2) { // Start at front of list and search forwards
       while (i >= u->length) {
@@ -155,9 +152,9 @@ class ULL<V>::Location ULL<V>::find_at(int i) {
    }
 }
 // ------------------------------------------------------------------------
-template <class V>
+template <class V, size_t BLOCK_SIZE>
 template <class... Args>
-void ULL<V>::insert_at(size_t i, Args&&... args) {
+void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
    assert(i >= 0 && i <= length);
 
    if (head == nullptr) {
@@ -223,8 +220,8 @@ void ULL<V>::insert_at(size_t i, Args&&... args) {
 }
 // ------------------------------------------------------------------------
 
-template <class V>
-void ULL<V>::spread(Node* u, Node* v) {
+template <class V, size_t BLOCK_SIZE>
+void ULL<V, BLOCK_SIZE>::spread(Node* u, Node* v) {
    size_t offset = length - BLOCK_SIZE + 1;
    std::copy(
       std::begin(v->data) + offset,
@@ -241,6 +238,10 @@ void ULL<V>::spread(Node* u, Node* v) {
       }
       v = v->prev;
    }
+}
+// ------------------------------------------------------------------------
+template <class V, size_t BLOCK_SIZE>
+void ULL<V, BLOCK_SIZE>::print_list() {
 }
 // ------------------------------------------------------------------------
 // Node - End
