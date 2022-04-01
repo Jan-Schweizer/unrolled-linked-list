@@ -93,7 +93,7 @@ class ULL {
 
    private:
    /// Store the end of the list in head->prev.
-   Node* head = nullptr; // TODO: Think about using a unique_ptr
+   Node* head = nullptr;
 
    /// Spreads the elements of the sequence u.next to v onto the sequence u.next to v.next,
    /// such that each node in the sequence u.next to v contains BLOCK_SIZE elements and
@@ -202,7 +202,7 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
       return;
    }
 
-   // Inserting in middle of list
+   // Inserting not at end of list
    Location l = find_at(i);
    int r = 0;
    Node* u = l.u;
@@ -219,18 +219,14 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
       u = end->prev;
       ++node_count;
    } else if (r == BLOCK_SIZE) { // case 3
+      u = u->prev;
       Node* tmp = new Node;
-      if (u->next) {
-         u->next->prev = tmp;
-         tmp->next = u->next;
-      } else {
-         head->prev = tmp;
-         tmp->next = nullptr;
-      }
+      u->next->prev = tmp;
+      tmp->next = u->next;
       u->next = tmp;
       tmp->prev = u;
-      spread(l.u, u);
       ++node_count;
+      spread(l.u, u);
    } else { // case 1
       u = u->prev;
    }
@@ -255,6 +251,8 @@ void ULL<V, BLOCK_SIZE>::spread(Node* u, Node* v) {
       std::begin(v->next->data));
    v->length -= BLOCK_SIZE - 1;
    v->next->length = BLOCK_SIZE - 1;
+
+   v = v->prev;
 
    while (v != u) {
       while (v->next->length < BLOCK_SIZE) {
