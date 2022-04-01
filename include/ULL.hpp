@@ -8,8 +8,11 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <iostream>
 // ------------------------------------------------------------------------
 // TODO: Replace data[i] = data[i + 1] with std::copy
+// TODO: Implement iterator
+// TODO: Implement subscript overload
 // ------------------------------------------------------------------------
 template <class V, size_t BLOCK_SIZE = 3>
 class ULL {
@@ -45,16 +48,14 @@ class ULL {
    };
 
    public:
-   /// Store the end of the list in head->prev.
-   Node* head = nullptr; // TODO: Think about using a unique_ptr
    size_t length = 0;
    size_t node_count = 0;
 
-   /// Returns the number of elements in the list.
-   size_t get_length() { return length; }
-
-   /// Returns the size of a node in bytes.
+   /// Returns the size of a node.
    size_t get_node_size() { return BLOCK_SIZE + 1; }
+
+   /// Returns the BLOCK_SIZE
+   size_t get_block_size() { return BLOCK_SIZE; }
 
    /// Returns true if the list is empty.
    bool is_empty() { return length == 0; }
@@ -64,6 +65,13 @@ class ULL {
 
    /// Finds value at position i. Returns Location of value.
    Location find_at(int i);
+
+   /// Gets a value at position i. Returns a pointer the value or nullptr if position is out of range.
+   V* get(int i) {
+      if (i < 0 || i >= length) return nullptr;
+      Location l = find_at(i);
+      return &l.u->data[l.i];
+   }
 
    /// Inserts a value at position i into the list.
    template <class... Args>
@@ -81,10 +89,13 @@ class ULL {
       return insert_at(0, std::forward<Args>(args)...);
    }
 
-   /// Prints the list to cout
+   /// Prints the list to cout.
    void print_list();
 
    private:
+   /// Store the end of the list in head->prev.
+   Node* head = nullptr; // TODO: Think about using a unique_ptr
+
    /// Spreads the elements of the sequence u.next to v onto the sequence u.next to v.next,
    /// such that each node in the sequence u.next to v contains BLOCK_SIZE elements and
    /// v.next contains BLOCK_SIZE - 1 elements.
@@ -169,6 +180,7 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
       if (end->length == BLOCK_SIZE + 1) {
          end = new Node;
          head->prev->next = end;
+         end->prev = head->prev;
          head->prev = end;
          ++node_count;
       }
@@ -189,6 +201,7 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
    if (u == nullptr) { // case 2
       Node* end = new Node;
       head->prev->next = end;
+      end->prev = head->prev;
       head->prev = end;
       u = end->prev;
       ++node_count;
@@ -210,7 +223,7 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
    }
 
    while (l.u != u) {
-      l.u->shift_r();
+      u->shift_r();
       u = u->prev;
    }
    l.u->shift_r();
@@ -242,6 +255,17 @@ void ULL<V, BLOCK_SIZE>::spread(Node* u, Node* v) {
 // ------------------------------------------------------------------------
 template <class V, size_t BLOCK_SIZE>
 void ULL<V, BLOCK_SIZE>::print_list() {
+   Node* current = head;
+   while (current != nullptr) {
+      std::cout << "[";
+      for (size_t i = 0; i < current->length - 1; ++i) {
+         std::cout << current->data[i] << ", ";
+      }
+      std::cout << current->data[current->length - 1] << "]"
+                << " -> " << std::endl;
+      current = current->next;
+   }
+   std::cout << "null" << std::endl;
 }
 // ------------------------------------------------------------------------
 // Node - End
