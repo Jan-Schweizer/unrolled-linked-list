@@ -247,15 +247,14 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
 // ------------------------------------------------------------------------
 template <class V, size_t BLOCK_SIZE>
 void ULL<V, BLOCK_SIZE>::spread(Node* u, Node* v) {
-   size_t offset = length - BLOCK_SIZE + 1;
+   // Bulk copy the first BLOCK_SIZE - 1 elements from vo to (the empty) v.next in order to save on shifting
+   size_t offset = v->length - BLOCK_SIZE + 1;
    std::copy(
       std::begin(v->data) + offset,
       std::begin(v->data) + offset + BLOCK_SIZE - 1,
       std::begin(v->next->data));
-   length -= BLOCK_SIZE - 1;
-   v->next->length += BLOCK_SIZE - 1;
-
-   v = v->prev;
+   v->length -= BLOCK_SIZE - 1;
+   v->next->length = BLOCK_SIZE - 1;
 
    while (v != u) {
       while (v->next->length < BLOCK_SIZE) {
