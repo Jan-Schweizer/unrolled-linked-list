@@ -12,7 +12,6 @@
 // ------------------------------------------------------------------------
 // TODO: Replace data[i] = data[i + 1] with std::copy
 // TODO: Implement iterator
-// TODO: Implement subscript overload
 // ------------------------------------------------------------------------
 template <class V, size_t BLOCK_SIZE = 3>
 class ULL {
@@ -61,7 +60,7 @@ class ULL {
    bool is_empty() { return length == 0; }
 
    ULL();
-   // ~ULL(); // delete every node
+   ~ULL();
 
    /// Finds value at position i. Returns Location of value.
    Location find_at(int i);
@@ -143,6 +142,20 @@ V ULL<V, BLOCK_SIZE>::Node::remove_at(size_t i) {
 // ULL - Begin
 template <class V, size_t BLOCK_SIZE>
 ULL<V, BLOCK_SIZE>::ULL() = default;
+// ------------------------------------------------------------------------
+template <class V, size_t BLOCK_SIZE>
+ULL<V, BLOCK_SIZE>::~ULL() {
+   Node* current = head;
+   Node* next;
+   while (current) {
+      for (size_t i = 0; i < current->length; ++i) {
+         current->data[i].~V();
+      }
+      next = current->next;
+      delete current;
+      current = next;
+   }
+}
 // ------------------------------------------------------------------------
 template <class V, size_t BLOCK_SIZE>
 class ULL<V, BLOCK_SIZE>::Location ULL<V, BLOCK_SIZE>::find_at(int i) {
@@ -232,7 +245,6 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
    ++length;
 }
 // ------------------------------------------------------------------------
-
 template <class V, size_t BLOCK_SIZE>
 void ULL<V, BLOCK_SIZE>::spread(Node* u, Node* v) {
    size_t offset = length - BLOCK_SIZE + 1;
