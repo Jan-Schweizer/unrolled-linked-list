@@ -1,15 +1,20 @@
-#include <iostream>
 #include "ULL.hpp"
-
-using namespace std;
 
 int main()
 {
   ULL<int> ull;
-  ull.append(42);
-  ull.append(100);
+  for (int i = 1; i <= 10; ++i) {
+     ull.append(i);
+  }
 
-  cout << ull.get_node_size() << endl;
+  ull.insert_at(1, 11);
+  ull.insert_at(2, 12);
+  ull.insert_at(4, 13);
+
+  auto* v = ull.get(1);
+  std::cout << "v: " << *v << std::endl;
+
+  ull.print_list();
 
   return 0;
 }

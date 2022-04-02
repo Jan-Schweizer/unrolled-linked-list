@@ -119,7 +119,7 @@ TEST(UllTest, InsertionSingleBlock) {
    std::vector<int> expected = {0, 42, 1, 2};
 
    ULL<int> ull;
-   for (int i = 0; i < 3; ++i){
+   for (int i = 0; i < 3; ++i) {
       ull.append(i);
    }
    ull.insert_at(1, 42);
