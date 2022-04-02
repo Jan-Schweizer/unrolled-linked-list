@@ -30,6 +30,20 @@ TEST(UllTest, InsertionCaseOne) {
    }
 }
 // ------------------------------------------------------------------------
+TEST(UllTest, InsertionCaseOneSingleBlock) {
+   std::vector<int> expected = {0, 42, 1, 2};
+
+   ULL<int> ull;
+   for (int i = 0; i < 3; ++i) {
+      ull.append(i);
+   }
+   ull.insert_at(1, 42);
+
+   for (int i = 0; i < expected.size(); ++i) {
+      EXPECT_EQ(*ull.get(i), expected[i]);
+   }
+}
+// ------------------------------------------------------------------------
 TEST(UllTest, InsertionCaseTwo) {
    std::vector<int> expected = {0, 42, 1, 2, 3, 4, 5, 6, 7};
 
@@ -44,6 +58,23 @@ TEST(UllTest, InsertionCaseTwo) {
 
    EXPECT_EQ(ull.length, expected.size());
    EXPECT_EQ(ull.node_count, ull.length / ull.get_block_size());
+   for (int i = 0; i < expected.size(); ++i) {
+      EXPECT_EQ(*ull.get(i), expected[i]);
+   }
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, InsertionCaseTwoSingleBlock) {
+   std::vector<int> expected{0, 42, 1, 2, 3};
+
+   ULL<int> ull;
+
+   ASSERT_TRUE(ull.is_empty());
+
+   for (int i = 0; i < 4; ++i) {
+      ull.append(i);
+   }
+   ull.insert_at(1, 42);
+
    for (int i = 0; i < expected.size(); ++i) {
       EXPECT_EQ(*ull.get(i), expected[i]);
    }
@@ -109,20 +140,6 @@ TEST(UllTest, InsetionAppendPrepend) {
    }
 
    ull.insert_at(11, 42);
-
-   for (int i = 0; i < expected.size(); ++i) {
-      EXPECT_EQ(*ull.get(i), expected[i]);
-   }
-}
-// ------------------------------------------------------------------------
-TEST(UllTest, InsertionSingleBlock) {
-   std::vector<int> expected = {0, 42, 1, 2};
-
-   ULL<int> ull;
-   for (int i = 0; i < 3; ++i) {
-      ull.append(i);
-   }
-   ull.insert_at(1, 42);
 
    for (int i = 0; i < expected.size(); ++i) {
       EXPECT_EQ(*ull.get(i), expected[i]);
