@@ -86,7 +86,7 @@ TEST(UllTest, InsertionCaseThreeBlockSizeFour) {
 }
 // ------------------------------------------------------------------------
 TEST(UllTest, InsetionAppendPrepend) {
-   std::vector<int> expected = {-15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+   std::vector<int> expected = {-15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, 42, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
    ULL<int> ull;
 
@@ -113,6 +113,19 @@ TEST(UllTest, InsetionAppendPrepend) {
    for (int i = 0; i < expected.size(); ++i) {
       EXPECT_EQ(*ull.get(i), expected[i]);
    }
-   ull.print_list();
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, InsertionSingleBlock) {
+   std::vector<int> expected = {0, 42, 1, 2};
+
+   ULL<int> ull;
+   for (int i = 0; i < 3; ++i){
+      ull.append(i);
+   }
+   ull.insert_at(1, 42);
+
+   for (int i = 0; i < expected.size(); ++i) {
+      EXPECT_EQ(*ull.get(i), expected[i]);
+   }
 }
 // ------------------------------------------------------------------------

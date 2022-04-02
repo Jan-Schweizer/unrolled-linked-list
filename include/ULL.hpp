@@ -227,6 +227,10 @@ void ULL<V, BLOCK_SIZE>::insert_at(size_t i, Args&&... args) {
       tmp->prev = u;
       ++node_count;
       spread(l.u, u);
+   } else if (u == l.u) { // case 1
+      l.u->insert_at(l.i, std::forward<Args>(args)...);
+      ++length;
+      return;
    } else { // case 1
       u = u->prev;
    }
