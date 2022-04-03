@@ -91,6 +91,61 @@ class ULL {
    /// Prints the list to cout.
    void print_list();
 
+   struct Iterator : std::iterator<std::random_access_iterator_tag, V> {
+      Iterator(Node* node, size_t i, ULL<V, BLOCK_SIZE>& ull) : node_(node), i_(i), ull_(ull) {}
+
+      V& operator*() const { return node_->data[i_]; }
+      V* operator->() const { return &node_->data[i_]; }
+      V& operator[](size_t i) const {
+         auto l = ull_.find_at(i);
+         return l.u->data[l.i];
+      }
+      Iterator& operator++() {
+         if (i_ == node_->length - 1) {
+            node_ = node_->next;
+            i_ = 0;
+         } else {
+            ++i_;
+         }
+         return *this;
+      }
+      Iterator operator++(int) {
+         Iterator tmp = *this;
+         ++(*this);
+         return tmp;
+      }
+      Iterator& operator--() {
+         if (i_ == 0) {
+            if (node_ == ull_.head) {
+               node_ = nullptr; // Needed because end of list is stored in head.prev
+            } else {
+               node_ = node_->prev;
+               i_ = node_->length - 1;
+            }
+         } else {
+            --i_;
+         }
+         return *this;
+      }
+      Iterator operator--(int) {
+         Iterator tmp = *this;
+         --(*this);
+         return tmp;
+      }
+      // TODO: +=
+      // TODO: -=
+      bool operator==(const Iterator& other) const { return node_ == other.node_ && i_ == other.i_; }
+      bool operator!=(const Iterator& other) const { return node_ != other.node_ || i_ != other.i_; }
+
+      private:
+      Node* node_;
+      size_t i_;
+      ULL<V, BLOCK_SIZE>& ull_; // Needed to provide random access
+   };
+
+   Iterator begin() { return Iterator(head, 0, *this); }
+   Iterator end() { return Iterator(nullptr, 0, *this); }
+
    private:
    /// Store the end of the list in head->prev.
    Node* head = nullptr;
