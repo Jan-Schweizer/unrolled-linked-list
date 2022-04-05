@@ -168,22 +168,6 @@ TEST(UllTest, Iterator) {
    }
 }
 // ------------------------------------------------------------------------
-TEST(UllTest, IteratorSubscript) {
-   std::vector<int> expected{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-
-   ULL<int> ull;
-
-   for (int i = 0; i < 10; ++i) {
-      ull.append(i);
-   }
-
-   int i = 0;
-   for (auto it = ull.begin(); it != ull.end(); ++it) {
-      EXPECT_EQ(it[i], expected[i]);
-      ++i;
-   }
-}
-// ------------------------------------------------------------------------
 TEST(UllTest, IteratorDecrement) {
    std::vector<int> expected{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
@@ -205,5 +189,21 @@ TEST(UllTest, IteratorDecrement) {
    }
 
    EXPECT_EQ(it, ull.end());
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, IteratorSubscript) {
+   std::vector<int> expected{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+   ULL<int> ull;
+
+   for (int i = 0; i < 10; ++i) {
+      ull.append(i);
+   }
+
+   int i = 0;
+   for (auto it = ull.begin(); it != ull.end(); ++it) {
+      EXPECT_EQ(it[i], expected[i]);
+      ++i;
+   }
 }
 // ------------------------------------------------------------------------

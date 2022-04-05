@@ -11,7 +11,7 @@
 #include <iostream>
 // ------------------------------------------------------------------------
 // TODO: Replace data[i] = data[i + 1] with std::copy
-// TODO: Implement iterator
+// TODO: Add subscript operator
 // ------------------------------------------------------------------------
 template <class V, size_t BLOCK_SIZE = 3>
 class ULL {
@@ -91,12 +91,18 @@ class ULL {
    /// Prints the list to cout.
    void print_list();
 
-   struct Iterator : std::iterator<std::random_access_iterator_tag, V> {
+   struct Iterator {
+      using iterator_category = std::bidirectional_iterator_tag;
+      using value_type = V;
+      using difference_type = std::ptrdiff_t;
+      using pointer = V*;
+      using reference = V&;
+
       Iterator(Node* node, size_t i, ULL<V, BLOCK_SIZE>& ull) : node_(node), i_(i), ull_(ull) {}
 
-      V& operator*() const { return node_->data[i_]; }
-      V* operator->() const { return &node_->data[i_]; }
-      V& operator[](size_t i) const {
+      reference operator*() const { return node_->data[i_]; }
+      pointer operator->() const { return &node_->data[i_]; }
+      reference operator[](size_t i) const { // Not needed for bidirectional iterator
          auto l = ull_.find_at(i);
          return l.u->data[l.i];
       }
@@ -132,15 +138,13 @@ class ULL {
          --(*this);
          return tmp;
       }
-      // TODO: +=
-      // TODO: -=
       bool operator==(const Iterator& other) const { return node_ == other.node_ && i_ == other.i_; }
       bool operator!=(const Iterator& other) const { return node_ != other.node_ || i_ != other.i_; }
 
       private:
       Node* node_;
       size_t i_;
-      ULL<V, BLOCK_SIZE>& ull_; // Needed to provide random access
+      ULL<V, BLOCK_SIZE>& ull_; // Needed to identify the end of list in head.prev
    };
 
    Iterator begin() { return Iterator(head, 0, *this); }
