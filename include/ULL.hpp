@@ -91,6 +91,9 @@ class ULL {
    /// Prints the list to cout.
    void print_list();
 
+   /// Returns a reference to the element at specified location i. No bounds checking is performed.
+   V& operator[](size_t i);
+
    struct Iterator {
       using iterator_category = std::bidirectional_iterator_tag;
       using value_type = V;
@@ -334,6 +337,14 @@ void ULL<V, BLOCK_SIZE>::print_list() {
       current = current->next;
    }
    std::cout << "null" << std::endl;
+}
+// ------------------------------------------------------------------------
+template <class V, size_t BLOCK_SIZE>
+V& ULL<V, BLOCK_SIZE>::operator[](size_t i) {
+   assert(i >= 0 && i < length);
+
+   auto l = find_at(i);
+   return l.u->data[l.i];
 }
 // ------------------------------------------------------------------------
 // Node - End
