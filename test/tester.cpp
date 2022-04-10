@@ -1,4 +1,5 @@
 #include "ULL.hpp"
+#include <random>
 #include <vector>
 #include <gtest/gtest.h>
 // ------------------------------------------------------------------------
@@ -217,5 +218,127 @@ TEST(UllTest, Subscript) {
    ull[5] = 42;
 
    EXPECT_EQ(ull[5], 42);
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, RemoveCaseOne) {
+   std::vector<int> expected{0, 4, 8, 9, 10, 11};
+
+   ULL<int> ull;
+
+   for (int i = 0; i < 12; ++i) {
+      ull.append(i);
+   }
+
+   // Prepare Case One
+   ull.remove_at(2);
+   ull.remove_at(2);
+   ull.remove_at(3);
+   ull.remove_at(3);
+   ull.remove_at(3);
+
+   ull.remove_at(1);
+
+   for (int i = 0; i < expected.size(); ++i) {
+      EXPECT_EQ(*ull.get(i), expected[i]);
+   }
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, RemoveCaseTwo) {
+   std::vector<int> expected{1, 5, 7};
+
+   ULL<int> ull;
+
+   for (int i = 0; i < 8; ++i) {
+      ull.append(i);
+   }
+
+   // Prepare Case Two
+   ull.remove_at(0);
+   ull.remove_at(1);
+   ull.remove_at(2);
+   ull.remove_at(3);
+
+   ull.remove_at(1);
+
+   for (int i = 0; i < expected.size(); ++i) {
+      EXPECT_EQ(*ull.get(i), expected[i]);
+   }
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, RemoveCaseThree) {
+   std::vector<int> expected{1, 5, 7, 9, 10, 12, 13, 14, 15};
+
+   ULL<int> ull;
+
+   for (int i = 0; i < 16; ++i) {
+      ull.append(i);
+   }
+
+   // Prepare Case Three
+   ull.remove_at(0);
+   ull.remove_at(2);
+   ull.remove_at(2);
+   ull.remove_at(3);
+   ull.remove_at(4);
+   ull.remove_at(6);
+
+   ull.remove_at(1);
+
+   for (int i = 0; i < expected.size(); ++i) {
+      EXPECT_EQ(*ull.get(i), expected[i]);
+   }
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, InsertionAndRemove) {
+   ULL<int> ull;
+
+   for (int i = 0; i < 8; ++i) {
+      ull.append(i);
+   }
+
+   ull.remove_at(4);
+   ull.remove_at(6);
+   ull.remove_at(2);
+   ull.remove_at(1);
+
+   for (int i = 8; i < 16; ++i) {
+      ull.insert_at(2, i);
+   }
+
+   ull.remove_at(7);
+   ull.remove_at(5);
+   ull.remove_at(3);
+   ull.remove_at(2);
+   ull.remove_at(3);
+   ull.remove_at(3);
+   ull.remove_at(1);
+   ull.remove_at(0);
+   ull.remove_at(0);
+   ull.remove_at(2);
+   ull.remove_at(1);
+   ull.remove_at(0);
+
+   EXPECT_TRUE(ull.is_empty());
+}
+// ------------------------------------------------------------------------
+TEST(UllTest, ManyInsertionsAndRemove) {
+   ULL<int> ull;
+   ull.append(0);
+
+   std::random_device rd;
+   std::mt19937 gen(rd());
+   for (int i = 1; i < 10'000; ++i) {
+      std::uniform_int_distribution<> dist(0, ull.length - 1);
+      ull.insert_at(dist(gen), i);
+   }
+
+   for (int i = 1; i < 10'000; ++i) {
+      std::uniform_int_distribution<> dist(0, ull.length - 1);
+      ull.remove_at(dist(gen));
+   }
+
+   ull.remove_at(0);
+
+   EXPECT_TRUE(ull.is_empty());
 }
 // ------------------------------------------------------------------------
